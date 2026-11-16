@@ -1,0 +1,176 @@
+# 🚗 Covoiturage Multi-Étapes
+
+**Plateforme REST de covoiturage avec gestion des trajets, des points d'arrêt et des réservations.**
+
+## 📌 Présentation
+
+Covoiturage Multi-Étapes est une application backend permettant aux conducteurs de publier des trajets avec plusieurs points d'arrêt et aux passagers de rechercher des itinéraires et de réserver des places.
+
+Contrairement à un système de covoiturage classique, la plateforme prend en charge les trajets intermédiaires. Un passager peut ainsi choisir un point de montée et un point de descente parmi les différentes étapes d'un même trajet.
+
+Ce projet est développé dans le cadre de la formation Full Stack Web Development à **YouCode Safi**.
+
+## 🎯 Objectifs du projet
+
+- Gérer les conducteurs et les passagers.
+- Gérer les véhicules associés aux conducteurs.
+- Publier et gérer des trajets multi-étapes.
+- Définir des points d'arrêt ordonnés.
+- Calculer le prix d'un trajet selon les points de montée et de descente.
+- Rechercher des trajets disponibles.
+- Gérer les réservations et les places disponibles.
+- Assurer la cohérence des données et le respect des règles métier.
+
+## 🛠️ Technologies utilisées
+
+| Technologie | Utilisation |
+|---|---|
+| Java 17 | Langage de programmation |
+| Spring Boot | Développement de l'application backend |
+| Spring Web | Création des API REST |
+| Spring Data JPA | Accès aux données |
+| Hibernate | Mapping objet-relationnel (ORM) |
+| PostgreSQL | Base de données relationnelle |
+| Docker Compose | Gestion de l'environnement PostgreSQL |
+| Maven | Gestion des dépendances et du build |
+| Jakarta Bean Validation | Validation des données |
+| JUnit 5 & Mockito | Tests unitaires |
+
+## 🏗️ Architecture
+
+Le projet adopte une architecture en couches afin de séparer les responsabilités :
+
+```text
+src/
+├── main/
+│   ├── java/ma/youcode/covoiturage/
+│   │   ├── entity/
+│   │   ├── repository/
+│   │   ├── service/
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── mapper/
+│   │   └── CovoiturageApplication.java
+│   │
+│   └── resources/
+│       └── application.properties/
+│
+└── test/
+    └── java/
+```
+
+## 📦 Modèle de données
+
+Le système repose sur les principales entités suivantes :
+
+- **Conducteur** : informations des conducteurs.
+- **Passager** : informations des passagers.
+- **Véhicule** : véhicules appartenant aux conducteurs.
+- **Trajet** : informations relatives aux trajets publiés.
+- **PointArret** : étapes et points de passage d'un trajet.
+- **Réservation** : réservations effectuées par les passagers.
+
+### Statuts
+
+**StatutTrajet**
+- PUBLIE
+- COMPLET
+- TERMINE
+- ANNULE
+
+**StatutReservation**
+- CONFIRMEE
+- ANNULEE
+
+## ⚙️ Prérequis
+
+Avant de démarrer le projet, assurez-vous d'avoir installé :
+
+- JDK 17 ou supérieur
+- IntelliJ IDEA
+- Docker Desktop
+- Git
+- Maven (ou utiliser le Maven Wrapper inclus)
+
+## 🚀 Installation et lancement
+
+### 1. Cloner le projet
+
+```bash
+git clone https://github.com/ezraidimariam/covoiturage-multi--tapes.git
+```
+
+### 2. Accéder au projet
+
+```bash
+cd covoiturage-multi--tapes
+```
+
+### 3. Démarrer PostgreSQL avec Docker Compose
+
+```bash
+docker compose up -d
+```
+
+### 4. Vérifier les conteneurs
+
+```bash
+docker compose ps
+```
+
+### 5. Lancer l'application
+
+Sous Windows :
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+Sous Linux ou macOS :
+
+```bash
+./mvnw spring-boot:run
+```
+
+## 🗄️ Configuration de la base de données
+
+La configuration PostgreSQL est définie dans `src/main/resources/application.properties`.
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/covoiturage
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+**Note :** Les identifiants ci-dessus sont destinés à l'environnement local de développement. Utilisez des variables d'environnement pour les déploiements.
+
+## 📈 État d'avancement
+
+Le projet est en cours de développement.
+
+- [x] Initialisation du projet Spring Boot
+- [x] Configuration de PostgreSQL avec Docker Compose
+- [x] Création des entités JPA
+- [x] Définition des énumérations
+- [ ] Création des repositories
+- [ ] Développement de la couche service
+- [ ] Création des DTO et des mappers
+- [ ] Développement des contrôleurs REST
+- [ ] Implémentation des règles métier
+- [ ] Gestion globale des exceptions
+- [ ] Tests unitaires
+- [ ] Documentation et collection Postman
+
+## 👩‍💻 Auteur
+
+**Mariam EZRAIDI**
+
+Étudiante en développement web Full Stack — YouCode Safi.
+
+## 📄 Licence
+
+Projet académique réalisé dans le cadre de la formation YouCode.
