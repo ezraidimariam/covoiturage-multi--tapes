@@ -1,4 +1,3 @@
-
 package ma.youcode.covoiturage.entity;
 
 import jakarta.persistence.Entity;
@@ -9,6 +8,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 
 @Entity
 @Table(name = "vehicules")
@@ -27,6 +28,8 @@ public class Vehicule {
 
     private String couleur;
 
+    @Min(1)
+    @Max(8)
     @Column(nullable = false)
     private int capacite;
 
