@@ -3,6 +3,8 @@ package ma.youcode.covoiturage.controller;
 
 import jakarta.validation.Valid;
 import ma.youcode.covoiturage.dto.TrajetDTO;
+import ma.youcode.covoiturage.dto.RechercheTrajetDTO;
+import ma.youcode.covoiturage.dto.TrajetRechercheResultatDTO;
 import ma.youcode.covoiturage.entity.Conducteur;
 import ma.youcode.covoiturage.entity.Trajet;
 import ma.youcode.covoiturage.entity.Vehicule;
@@ -10,6 +12,9 @@ import ma.youcode.covoiturage.mapper.TrajetMapper;
 import ma.youcode.covoiturage.service.ConducteurService;
 import ma.youcode.covoiturage.service.TrajetService;
 import ma.youcode.covoiturage.service.VehiculeService;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -79,6 +84,15 @@ public class TrajetController {
                 .stream()
                 .map(trajetMapper::toDTO)
                 .toList();
+    }
+
+    // Recherche avec pagination
+    @GetMapping("/rechercher")
+    public Page<TrajetRechercheResultatDTO> rechercher(
+            @Valid @ModelAttribute RechercheTrajetDTO criteres,
+            Pageable pageable) {
+
+        return trajetService.rechercher(criteres, pageable);
     }
 
     @GetMapping("/{id}")

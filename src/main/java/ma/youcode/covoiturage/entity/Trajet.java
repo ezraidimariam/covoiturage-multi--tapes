@@ -1,7 +1,10 @@
 
 package ma.youcode.covoiturage.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +36,13 @@ public class Trajet {
     @JoinColumn(name = "vehicule_id", nullable = false)
     private Vehicule vehicule;
 
+    @JsonManagedReference("trajet-points")
     @OneToMany(mappedBy = "trajet",
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private List<PointArret> pointsArret = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "trajet")
     private List<Reservation> reservations = new ArrayList<>();
 

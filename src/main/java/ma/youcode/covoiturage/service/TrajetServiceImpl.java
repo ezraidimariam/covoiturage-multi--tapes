@@ -1,10 +1,15 @@
 
 package ma.youcode.covoiturage.service;
 
+import ma.youcode.covoiturage.dto.RechercheTrajetDTO;
+import ma.youcode.covoiturage.dto.TrajetRechercheResultatDTO;
 import ma.youcode.covoiturage.entity.*;
 import ma.youcode.covoiturage.repository.TrajetRepository;
 import ma.youcode.covoiturage.repository.PointArretRepository;
 import ma.youcode.covoiturage.repository.ReservationRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -194,6 +199,30 @@ public class TrajetServiceImpl implements TrajetService {
     public void supprimer(Long id) {
         Trajet trajet = chercherParId(id);
         trajetRepository.delete(trajet);
+    }
+
+    @Override
+    public Page<TrajetRechercheResultatDTO> rechercher(
+            RechercheTrajetDTO criteres,
+            Pageable pageable) {
+
+        LocalDateTime debutJournee =
+                criteres.dateDepart().atStartOfDay();
+
+        LocalDateTime lendemain =
+                debutJournee.plusDays(1);
+
+        return trajetRepository.rechercher(
+                criteres.villeDepart(),
+                criteres.villeArrivee(),
+                debutJournee,
+                lendemain,
+                criteres.nombrePlaces(),
+                criteres.prixMax(),
+                StatutTrajet.PUBLIE,
+                StatutReservation.CONFIRMEE,
+                pageable
+        );
     }
 
     private void verifierDateDepart(LocalDateTime dateDepart) {

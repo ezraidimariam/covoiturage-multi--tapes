@@ -1,7 +1,9 @@
 
 package ma.youcode.covoiturage.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -21,6 +23,7 @@ public class PointArret {
 
     private BigDecimal prixDepuisDepart;
 
+    @JsonBackReference("trajet-points")
     @ManyToOne
     @JoinColumn(name = "trajet_id", nullable = false)
     private Trajet trajet;
