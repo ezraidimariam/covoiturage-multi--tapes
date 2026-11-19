@@ -1,176 +1,189 @@
-# 🚗 Covoiturage Multi-Étapes
+# Covoiturage multi-étapes
 
-**Plateforme REST de covoiturage avec gestion des trajets, des points d'arrêt et des réservations.**
+> Une API REST pour publier, rechercher et réserver des trajets avec plusieurs points d’arrêt.
 
-## 📌 Présentation
+Cette application backend permet aux conducteurs de gérer leurs véhicules et leurs trajets, et aux passagers de rechercher des itinéraires et de réserver un segment entre deux arrêts. Elle est construite avec Java et Spring Boot, et utilise PostgreSQL pour stocker ses données.
 
-Covoiturage Multi-Étapes est une application backend permettant aux conducteurs de publier des trajets avec plusieurs points d'arrêt et aux passagers de rechercher des itinéraires et de réserver des places.
+## Fonctionnalités
 
-Contrairement à un système de covoiturage classique, la plateforme prend en charge les trajets intermédiaires. Un passager peut ainsi choisir un point de montée et un point de descente parmi les différentes étapes d'un même trajet.
+- Gestion des conducteurs, des passagers et de leurs véhicules.
+- Création et gestion de trajets, avec publication et annulation.
+- Ajout de points d’arrêt ordonnés sur un trajet.
+- Recherche paginée selon les villes de départ et d’arrivée, la date, le nombre de places et un prix maximal facultatif.
+- Réservation entre un point de montée et un point de descente, avec gestion de l’annulation.
+- Validation des données d’entrée pour plusieurs ressources.
 
-Ce projet est développé dans le cadre de la formation Full Stack Web Development à **YouCode Safi**.
+## Technologies
 
-## 🎯 Objectifs du projet
+| Outil | Rôle |
+| --- | --- |
+| Java 17 | Langage |
+| Spring Boot 4.1.2 | Application et API REST |
+| Spring Web MVC | Contrôleurs HTTP |
+| Spring Data JPA / Hibernate | Persistance et ORM |
+| PostgreSQL 16 | Base de données |
+| Jakarta Bean Validation | Validation des requêtes |
+| MapStruct 1.6.3 | Mapping entre DTO et entités |
+| Maven Wrapper | Build et lancement |
+| Docker Compose | Base de données locale |
 
-- Gérer les conducteurs et les passagers.
-- Gérer les véhicules associés aux conducteurs.
-- Publier et gérer des trajets multi-étapes.
-- Définir des points d'arrêt ordonnés.
-- Calculer le prix d'un trajet selon les points de montée et de descente.
-- Rechercher des trajets disponibles.
-- Gérer les réservations et les places disponibles.
-- Assurer la cohérence des données et le respect des règles métier.
+## Prérequis
 
-## 🛠️ Technologies utilisées
+- JDK 17 ou plus récent
+- Docker Desktop (ou Docker Engine avec le plugin Compose)
+- Git, si vous clonez le dépôt
 
-| Technologie | Utilisation |
-|---|---|
-| Java 17 | Langage de programmation |
-| Spring Boot | Développement de l'application backend |
-| Spring Web | Création des API REST |
-| Spring Data JPA | Accès aux données |
-| Hibernate | Mapping objet-relationnel (ORM) |
-| PostgreSQL | Base de données relationnelle |
-| Docker Compose | Gestion de l'environnement PostgreSQL |
-| Maven | Gestion des dépendances et du build |
-| Jakarta Bean Validation | Validation des données |
-| JUnit 5 & Mockito | Tests unitaires |
+Le Maven Wrapper est inclus : il n’est pas nécessaire d’installer Maven séparément.
 
-## 🏗️ Architecture
+## Démarrage rapide
 
-Le projet adopte une architecture en couches afin de séparer les responsabilités :
-
-```text
-src/
-├── main/
-│   ├── java/ma/youcode/covoiturage/
-│   │   ├── entity/
-│   │   ├── repository/
-│   │   ├── service/
-│   │   ├── controller/
-│   │   ├── dto/
-│   │   ├── mapper/
-│   │   └── CovoiturageApplication.java
-│   │
-│   └── resources/
-│       └── application.properties/
-│
-└── test/
-    └── java/
-```
-
-## 📦 Modèle de données
-
-Le système repose sur les principales entités suivantes :
-
-- **Conducteur** : informations des conducteurs.
-- **Passager** : informations des passagers.
-- **Véhicule** : véhicules appartenant aux conducteurs.
-- **Trajet** : informations relatives aux trajets publiés.
-- **PointArret** : étapes et points de passage d'un trajet.
-- **Réservation** : réservations effectuées par les passagers.
-
-### Statuts
-
-**StatutTrajet**
-- PUBLIE
-- COMPLET
-- TERMINE
-- ANNULE
-
-**StatutReservation**
-- CONFIRMEE
-- ANNULEE
-
-## ⚙️ Prérequis
-
-Avant de démarrer le projet, assurez-vous d'avoir installé :
-
-- JDK 17 ou supérieur
-- IntelliJ IDEA
-- Docker Desktop
-- Git
-- Maven (ou utiliser le Maven Wrapper inclus)
-
-## 🚀 Installation et lancement
-
-### 1. Cloner le projet
+### 1. Récupérer le projet
 
 ```bash
 git clone https://github.com/ezraidimariam/covoiturage-multi--tapes.git
-```
-
-### 2. Accéder au projet
-
-```bash
 cd covoiturage-multi--tapes
 ```
 
-### 3. Démarrer PostgreSQL avec Docker Compose
+Si le dépôt est déjà présent, placez-vous simplement dans son dossier.
+
+### 2. Démarrer PostgreSQL
 
 ```bash
 docker compose up -d
-```
-
-### 4. Vérifier les conteneurs
-
-```bash
 docker compose ps
 ```
 
-### 5. Lancer l'application
+Compose lance PostgreSQL 16 et expose le port `15433` sur votre machine. Les données sont conservées dans le volume `postgres_data`.
 
-Sous Windows :
+### 3. Lancer l’API
 
-```bash
-mvnw.cmd spring-boot:run
+Windows PowerShell :
+
+```powershell
+.\mvnw.cmd spring-boot:run
 ```
 
-Sous Linux ou macOS :
+Linux ou macOS :
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-## 🗄️ Configuration de la base de données
+L’API écoute sur **http://localhost:8082**. Le démarrage Spring Boot est configuré pour utiliser le fichier `docker-compose.yml` du projet.
 
-La configuration PostgreSQL est définie dans `src/main/resources/application.properties`.
+Pour arrêter la base de données :
 
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:15433/covoiturage
-spring.datasource.username=postgres
-spring.datasource.password=postgres
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+```bash
+docker compose down
 ```
 
-**Note :** Les identifiants ci-dessus sont destinés à l'environnement local de développement. Utilisez des variables d'environnement pour les déploiements.
+Cette commande conserve le volume de données. Pour supprimer aussi les données locales de PostgreSQL, utilisez `docker compose down -v`.
 
-## 📈 État d'avancement
+## Configuration
 
-Le projet est en cours de développement.
+La configuration locale se trouve dans [`src/main/resources/application.properties`](src/main/resources/application.properties), et les paramètres du conteneur PostgreSQL dans [`docker-compose.yml`](docker-compose.yml).
 
-- [x] Initialisation du projet Spring Boot
-- [x] Configuration de PostgreSQL avec Docker Compose
-- [x] Création des entités JPA
-- [x] Définition des énumérations
-- [ ] Création des repositories
-- [ ] Développement de la couche service
-- [ ] Création des DTO et des mappers
-- [ ] Développement des contrôleurs REST
-- [ ] Implémentation des règles métier
-- [ ] Gestion globale des exceptions
-- [ ] Tests unitaires
-- [ ] Documentation et collection Postman
+| Paramètre local | Valeur actuelle |
+| --- | --- |
+| URL JDBC | `jdbc:postgresql://127.0.0.1:15433/covoiturage` |
+| Base de données | `covoiturage` |
+| Utilisateur | `postgres` |
+| Mot de passe | `postgres` |
+| Port HTTP | `8082` |
 
-## 👩‍💻 Auteur
+Ces identifiants sont prévus pour le développement local. Changez-les avant tout déploiement et évitez de stocker des secrets dans le dépôt. Hibernate utilise actuellement `ddl-auto=update`; SQL est également affiché dans les journaux.
 
-**Mariam EZRAIDI**
+## API REST
 
-Étudiante en développement web Full Stack — YouCode Safi.
+Toutes les routes sont préfixées par `/api`. Les réponses et corps de requête utilisent JSON. Les identifiants sont transmis dans le chemin ou dans les DTO sous forme de champs `...Id`.
 
-## 📄 Licence
+| Ressource | Routes disponibles |
+| --- | --- |
+| Conducteurs | `/api/conducteurs` — `GET`, `POST`; `/api/conducteurs/{id}` — `GET`, `PUT`, `DELETE` |
+| Passagers | `/api/passagers` — `GET`, `POST`; `/api/passagers/{id}` — `GET`, `PUT`, `DELETE` |
+| Véhicules | `/api/vehicules` — `GET`, `POST`; `/api/vehicules/{id}` — `GET`, `PUT`, `DELETE` |
+| Trajets | `/api/trajets` — `GET`, `POST`; `/api/trajets/{id}` — `GET`, `PUT`, `DELETE` |
+| Points d’arrêt | `/api/points-arret` — `GET`, `POST`; `/api/points-arret/{id}` — `GET`, `PUT`, `DELETE` |
+| Réservations | `/api/reservations` — `GET`, `POST`; `/api/reservations/{id}` — `GET`, `PUT`, `DELETE` |
 
-Projet académique réalisé dans le cadre de la formation YouCode.
+Actions dédiées : `POST /api/trajets/{id}/publier`, `POST /api/trajets/{id}/annuler` et `PATCH /api/reservations/{id}/annuler`.
+
+### Recherche de trajets
+
+`GET /api/trajets/rechercher` accepte les paramètres suivants :
+
+| Paramètre | Type | Requis |
+| --- | --- | --- |
+| `villeDepart` | texte | oui |
+| `villeArrivee` | texte | oui |
+| `dateDepart` | date ISO (`YYYY-MM-DD`) | oui |
+| `nombrePlaces` | entier, au moins 1 | oui |
+| `prixMax` | nombre décimal | non |
+| `page`, `size`, `sort` | pagination Spring Data | non |
+
+Exemple :
+
+```http
+GET http://localhost:8082/api/trajets/rechercher?villeDepart=Safi&villeArrivee=Casablanca&dateDepart=2026-12-01&nombrePlaces=2&page=0&size=10
+```
+
+La recherche renvoie une page de résultats contenant le trajet, le prix du segment et le nombre de places restantes.
+
+### Exemple : créer un passager
+
+```http
+POST http://localhost:8082/api/passagers
+Content-Type: application/json
+```
+
+```json
+{
+  "nom": "Alaoui",
+  "prenom": "Sara",
+  "email": "sara@example.com",
+  "telephone": "+212600000000"
+}
+```
+
+La création renvoie le passager créé avec son identifiant. Les DTO de trajets, arrêts et réservations référencent les autres ressources par identifiant; créez donc les ressources associées avant de les utiliser.
+
+## Modèle métier
+
+- **Conducteur** possède des véhicules et publie des trajets.
+- **Trajet** relie une ville de départ à une ville d’arrivée, possède une capacité proposée et peut comporter plusieurs points d’arrêt.
+- **Point d’arrêt** porte une ville, un ordre, une heure de passage et un prix depuis le départ.
+- **Passager** effectue une **réservation** entre un point de montée et un point de descente.
+- Les statuts de trajet sont `PUBLIE`, `COMPLET`, `TERMINE` et `ANNULE`.
+- Les statuts de réservation sont `CONFIRMEE` et `ANNULEE`.
+
+Les capacités de véhicule sont validées entre 1 et 8 places. Lors de la création d’un trajet, l’application vérifie que le véhicule appartient au conducteur indiqué et que les places proposées ne dépassent pas sa capacité.
+
+## Structure du projet
+
+```text
+src/main/java/ma/youcode/covoiturage/
+├── controller/   # Contrôleurs REST
+├── dto/          # Objets d’entrée et de sortie de l’API
+├── entity/       # Entités JPA et statuts
+├── mapper/       # Conversion DTO ↔ entités
+├── repository/   # Accès aux données
+└── service/      # Logique applicative
+```
+
+## Vérifications
+
+Pour compiler et exécuter les tests présents :
+
+```bash
+./mvnw test
+```
+
+Sous Windows, utilisez `.\mvnw.cmd test`. Les tests nécessitant une connexion à la base de données doivent être exécutés avec PostgreSQL disponible.
+
+## État du projet
+
+Le dépôt contient les couches de contrôleur, service, repository, mapper et entité pour les principales ressources, ainsi qu’une recherche paginée de trajets. La gestion des erreurs et la validation ne sont pas encore uniformes sur toutes les routes. Consultez les contrôleurs pour le comportement courant de chaque endpoint.
+
+## Contexte
+
+Projet académique de covoiturage multi-étapes réalisé dans le cadre de la formation Full Stack Web Development à YouCode Safi.
