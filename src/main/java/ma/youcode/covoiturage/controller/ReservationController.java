@@ -1,6 +1,8 @@
+
 package ma.youcode.covoiturage.controller;
 
 import jakarta.validation.Valid;
+
 import ma.youcode.covoiturage.dto.ReservationDTO;
 import ma.youcode.covoiturage.service.ReservationService;
 
@@ -39,6 +41,11 @@ public class ReservationController {
             @Valid @RequestBody ReservationDTO dto
     ) {
         return reservationService.modifier(id, dto);
+    }
+
+    @PatchMapping("/{id}/annuler")
+    public void annuler(@PathVariable Long id) {
+        reservationService.annuler(id);
     }
 
     @DeleteMapping("/{id}")

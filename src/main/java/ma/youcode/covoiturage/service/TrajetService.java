@@ -14,5 +14,9 @@ public interface TrajetService {
 
     Trajet modifier(Long id, Trajet trajet);
 
+    Trajet publier(Long id);
+
+    void annuler(Long id);
+
     void supprimer(Long id);
 }

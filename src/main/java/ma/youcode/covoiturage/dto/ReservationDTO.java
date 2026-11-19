@@ -1,7 +1,9 @@
+
 package ma.youcode.covoiturage.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+
 import ma.youcode.covoiturage.entity.StatutReservation;
 
 import java.math.BigDecimal;
@@ -13,13 +15,10 @@ public record ReservationDTO(
         @Min(1)
         int nombrePlaces,
 
-        @NotNull
         BigDecimal montantTotal,
 
-        @NotNull
         LocalDateTime dateReservation,
 
-        @NotNull
         StatutReservation statut,
 
         @NotNull

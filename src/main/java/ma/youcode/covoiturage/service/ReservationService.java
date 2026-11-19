@@ -1,3 +1,4 @@
+
 package ma.youcode.covoiturage.service;
 
 import ma.youcode.covoiturage.dto.ReservationDTO;
@@ -13,6 +14,8 @@ public interface ReservationService {
     ReservationDTO trouverParId(Long id);
 
     ReservationDTO modifier(Long id, ReservationDTO dto);
+
+    void annuler(Long id);
 
     void supprimer(Long id);
 }

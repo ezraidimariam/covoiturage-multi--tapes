@@ -58,7 +58,7 @@ public class TrajetController {
 
         if (!vehicule.getConducteur().getId().equals(conducteur.getId())) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+                    HttpStatus.FORBIDDEN,
                     "Ce véhicule n'appartient pas à ce conducteur");
         }
 
@@ -83,14 +83,7 @@ public class TrajetController {
 
     @GetMapping("/{id}")
     public TrajetDTO chercherParId(@PathVariable Long id) {
-
         Trajet trajet = trajetService.chercherParId(id);
-
-        if (trajet == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Trajet introuvable");
-        }
-
         return trajetMapper.toDTO(trajet);
     }
 
@@ -117,7 +110,7 @@ public class TrajetController {
 
         if (!vehicule.getConducteur().getId().equals(conducteur.getId())) {
             throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
+                    HttpStatus.FORBIDDEN,
                     "Ce véhicule n'appartient pas à ce conducteur");
         }
 
@@ -138,17 +131,20 @@ public class TrajetController {
         return trajetMapper.toDTO(modifie);
     }
 
+    @PostMapping("/{id}/publier")
+    public TrajetDTO publier(@PathVariable Long id) {
+        return trajetMapper.toDTO(trajetService.publier(id));
+    }
+
+    @PostMapping("/{id}/annuler")
+    public TrajetDTO annuler(@PathVariable Long id) {
+        trajetService.annuler(id);
+        return trajetMapper.toDTO(trajetService.chercherParId(id));
+    }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void supprimer(@PathVariable Long id) {
-
-        Trajet trajet = trajetService.chercherParId(id);
-
-        if (trajet == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Trajet introuvable");
-        }
-
         trajetService.supprimer(id);
     }
 }
