@@ -29,7 +29,7 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
                      FROM Reservation r
                      WHERE r.trajet.id = t.id
                      AND r.statut = :statutReservation),
-                    0
+                    0L
                 )
             )
             FROM Trajet t
@@ -46,7 +46,7 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
                  FROM Reservation r
                  WHERE r.trajet.id = t.id
                  AND r.statut = :statutReservation),
-                0
+                0L
             ) >= :nombrePlaces
             AND (
                 :prixMax IS NULL
@@ -70,7 +70,7 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
                  FROM Reservation r
                  WHERE r.trajet.id = t.id
                  AND r.statut = :statutReservation),
-                0
+                0L
             ) >= :nombrePlaces
             AND (
                 :prixMax IS NULL

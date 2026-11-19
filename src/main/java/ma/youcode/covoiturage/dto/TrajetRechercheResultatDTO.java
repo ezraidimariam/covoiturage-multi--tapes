@@ -8,4 +8,7 @@ public record TrajetRechercheResultatDTO(
         BigDecimal prixSegment,
         Long placesRestantes
 ) {
+    public TrajetRechercheResultatDTO(Trajet trajet, int prixSegment, int placesRestantes) {
+        this(trajet, BigDecimal.valueOf(prixSegment), (long) placesRestantes);
+    }
 }
