@@ -77,4 +77,5 @@ public class Conducteur {
     public void setNumeroPermis(String numeroPermis) {
         this.numeroPermis = numeroPermis;
     }
+    
 }
