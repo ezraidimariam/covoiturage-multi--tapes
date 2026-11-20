@@ -284,3 +284,56 @@ class ReservationServiceImplTest {
         verify(reservationRepository, never()).save(any(Reservation.class));
     }
 
+    @Test
+    void refuserReservationSiNombrePlacesZero() {
+
+        Passager passager = mock(Passager.class);
+        when(passager.getId()).thenReturn(1L);
+
+        Trajet trajet = mock(Trajet.class);
+        when(trajet.getId()).thenReturn(10L);
+        when(trajet.getStatut()).thenReturn(StatutTrajet.PUBLIE);
+
+        PointArret montee = mock(PointArret.class);
+        when(montee.getTrajet()).thenReturn(trajet);
+        when(montee.getOrdre()).thenReturn(0);
+
+        PointArret descente = mock(PointArret.class);
+        when(descente.getTrajet()).thenReturn(trajet);
+        when(descente.getOrdre()).thenReturn(1);
+
+        ReservationDTO dto = new ReservationDTO(
+                null, 0, null, null, null,
+                1L, 10L, 100L, 101L
+        );
+
+        when(passagerRepository.findById(1L))
+                .thenReturn(Optional.of(passager));
+
+        when(trajetRepository.findById(10L))
+                .thenReturn(Optional.of(trajet));
+
+        when(pointArretRepository.findById(100L))
+                .thenReturn(Optional.of(montee));
+
+        when(pointArretRepository.findById(101L))
+                .thenReturn(Optional.of(descente));
+
+        when(reservationRepository.existsByPassager_IdAndTrajet_IdAndStatut(
+                1L, 10L, StatutReservation.CONFIRMEE
+        )).thenReturn(false);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> reservationService.creer(dto)
+        );
+
+        assertThat(exception.getStatusCode())
+                .isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(exception.getReason())
+                .isEqualTo("Le nombre de places doit être supérieur à zéro");
+
+        verify(reservationRepository, never()).save(any(Reservation.class));
+    }
+}
