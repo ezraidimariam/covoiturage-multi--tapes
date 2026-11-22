@@ -1,3 +1,7 @@
+//« L'entité Passager représente un utilisateur qui utilise la plateforme
+// pour rechercher des trajets et réserver des places. Elle contient ses informations personnelles : nom, prénom, email et téléphone.
+// Elle est associée à la table passagers dans la base de données. »
+
 
 package ma.youcode.covoiturage.entity;
 
