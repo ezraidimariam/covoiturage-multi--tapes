@@ -15,11 +15,15 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+// Repository pour gérer et rechercher les trajets.
 public interface TrajetRepository extends JpaRepository<Trajet, Long> {
 
+    // Vérifie si un véhicule est déjà utilisé dans un trajet.
     boolean existsByVehicule_Id(Long vehiculeId);
 
+    // Recherche les trajets selon les critères fournis.
     @Query(
+            // Requête principale : retourne les trajets avec leur prix et les places restantes.
             value = """
             SELECT new ma.youcode.covoiturage.dto.TrajetRechercheResultatDTO(
                 t,
@@ -54,6 +58,8 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
             )
             ORDER BY t.dateDepart ASC
             """,
+
+            // Requête qui compte le nombre total de trajets correspondant aux critères.
             countQuery = """
             SELECT COUNT(DISTINCT t.id)
             FROM Trajet t
@@ -78,6 +84,9 @@ public interface TrajetRepository extends JpaRepository<Trajet, Long> {
             )
             """
     )
+
+    // Retourne les résultats sous forme de pages.
+    // Chaque paramètre correspond à un critère de recherche.
     Page<TrajetRechercheResultatDTO> rechercher(
             @Param("villeDepart") String villeDepart,
             @Param("villeArrivee") String villeArrivee,
