@@ -1,3 +1,9 @@
+//« Ici, nous avons l'entité Conducteur.
+// Elle représente les informations d'un conducteur dans notre plateforme de
+// covoiturage, comme son nom, son prénom, son adresse e-mail, son numéro de
+// téléphone et son numéro de permis. Cette entité est liée à la table conducteurs dans notre base de données. Elle contient également un
+// identifiant généré automatiquement ainsi que les getters et setters nécessaires pour accéder aux attributs et les modifier. »
+
 
 package ma.youcode.covoiturage.entity;
 

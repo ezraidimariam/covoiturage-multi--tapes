@@ -1,3 +1,4 @@
+
 package ma.youcode.covoiturage.controller;
 
 import ma.youcode.covoiturage.dto.ConducteurDTO;
@@ -6,6 +7,7 @@ import ma.youcode.covoiturage.mapper.ConducteurMapper;
 import ma.youcode.covoiturage.service.ConducteurService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -44,7 +46,10 @@ public class ConducteurController {
         Conducteur conducteur = conducteurService.chercherParId(id);
 
         if (conducteur == null) {
-            return null;
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Conducteur introuvable"
+            );
         }
 
         return conducteurMapper.toDTO(conducteur);
