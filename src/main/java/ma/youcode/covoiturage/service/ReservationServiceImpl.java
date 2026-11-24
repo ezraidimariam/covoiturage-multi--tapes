@@ -10,8 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -21,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReservationServiceImpl.class);
 
     private final ReservationRepository reservationRepository;
     private final PassagerRepository passagerRepository;
@@ -93,7 +98,8 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         BigDecimal montantTotal =
-                prixUnitaire.multiply(BigDecimal.valueOf(dto.nombrePlaces()));
+                prixUnitaire.multiply(BigDecimal.valueOf(dto.nombrePlaces()))
+                        .setScale(2, RoundingMode.HALF_UP);
 
         Reservation reservation = new Reservation();
 
@@ -107,6 +113,7 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setPointDescente(pointDescente);
 
         Reservation saved = reservationRepository.save(reservation);
+        log.info("Réservation {} confirmée pour le trajet {}", saved.getId(), trajet.getId());
 
         Long placesReservees = reservationRepository.compterPlacesReservees(
                 trajet.getId(),
@@ -183,6 +190,22 @@ public class ReservationServiceImpl implements ReservationService {
     public List<ReservationDTO> trouverTous() {
 
         return reservationRepository.findAll()
+                .stream()
+                .map(reservationMapper::toDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ReservationDTO> trouverParPassager(Long passagerId) {
+        return reservationRepository.findByPassager_IdOrderByDateReservationDesc(passagerId)
+                .stream()
+                .map(reservationMapper::toDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ReservationDTO> trouverParConducteur(Long conducteurId) {
+        return reservationRepository.findByTrajet_Conducteur_IdOrderByDateReservationDesc(conducteurId)
                 .stream()
                 .map(reservationMapper::toDTO)
                 .toList();
@@ -289,7 +312,8 @@ public class ReservationServiceImpl implements ReservationService {
         }
 
         BigDecimal montantTotal =
-                prixUnitaire.multiply(BigDecimal.valueOf(dto.nombrePlaces()));
+                prixUnitaire.multiply(BigDecimal.valueOf(dto.nombrePlaces()))
+                        .setScale(2, RoundingMode.HALF_UP);
 
         Trajet ancienTrajet = reservation.getTrajet();
 
@@ -336,6 +360,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         reservation.setStatut(StatutReservation.ANNULEE);
         reservationRepository.save(reservation);
+        log.info("Réservation {} annulée", reservation.getId());
 
         mettreAJourStatutTrajet(trajet);
     }
@@ -364,17 +389,6 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     public void supprimer(Long id) {
-
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Réservation introuvable"
-                ));
-
-        Trajet trajet = reservation.getTrajet();
-
-        reservationRepository.delete(reservation);
-
-        mettreAJourStatutTrajet(trajet);
+        annuler(id);
     }
 }

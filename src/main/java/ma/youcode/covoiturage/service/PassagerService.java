@@ -11,6 +11,8 @@ public interface PassagerService {
 
     List<Passager> lister();
 
+    Passager chercherParEmail(String email);
+
     Passager chercherParId(Long id);
 
     Passager modifier(Long id, Passager passager);

@@ -3,6 +3,7 @@ package ma.youcode.covoiturage.controller;
 
 import jakarta.validation.Valid;
 import ma.youcode.covoiturage.dto.TrajetDTO;
+import ma.youcode.covoiturage.dto.TrajetDetailDTO;
 import ma.youcode.covoiturage.dto.RechercheTrajetDTO;
 import ma.youcode.covoiturage.dto.TrajetRechercheResultatDTO;
 import ma.youcode.covoiturage.entity.Conducteur;
@@ -30,17 +31,20 @@ public class TrajetController {
     private final ConducteurService conducteurService;
     private final VehiculeService vehiculeService;
     private final TrajetMapper trajetMapper;
+    private final ma.youcode.covoiturage.mapper.PointArretMapper pointArretMapper;
 
     public TrajetController(
             TrajetService trajetService,
             ConducteurService conducteurService,
             VehiculeService vehiculeService,
-            TrajetMapper trajetMapper) {
+            TrajetMapper trajetMapper,
+            ma.youcode.covoiturage.mapper.PointArretMapper pointArretMapper) {
 
         this.trajetService = trajetService;
         this.conducteurService = conducteurService;
         this.vehiculeService = vehiculeService;
         this.trajetMapper = trajetMapper;
+        this.pointArretMapper = pointArretMapper;
     }
 
     @PostMapping
@@ -106,6 +110,13 @@ public class TrajetController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
+        if (page < 0 || size < 1 || size > 100) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "La page doit être positive et la taille comprise entre 1 et 100"
+            );
+        }
+
         // Création de la pagination sans tri.
         // Le tri est déjà défini dans la requête du Repository.
         Pageable pagination = PageRequest.of(page, size);
@@ -114,11 +125,26 @@ public class TrajetController {
     }
 
     @GetMapping("/{id}")
-    public TrajetDTO chercherParId(@PathVariable Long id) {
+    public TrajetDetailDTO chercherParId(@PathVariable Long id) {
 
         Trajet trajet = trajetService.chercherParId(id);
-
-        return trajetMapper.toDTO(trajet);
+        return new TrajetDetailDTO(
+                trajet.getId(),
+                trajet.getVilleDepart(),
+                trajet.getVilleArrivee(),
+                trajet.getDateDepart(),
+                trajet.getPlacesProposees(),
+                trajetService.placesRestantes(id),
+                trajet.getStatut(),
+                trajet.getConducteur().getId(),
+                trajet.getConducteur().getPrenom() + " " + trajet.getConducteur().getNom(),
+                trajet.getVehicule().getId(),
+                trajet.getPointsArret().stream()
+                        .sorted(java.util.Comparator.comparingInt(
+                                ma.youcode.covoiturage.entity.PointArret::getOrdre))
+                        .map(pointArretMapper::toDTO)
+                        .toList()
+        );
     }
 
     @PutMapping("/{id}")
@@ -185,13 +211,14 @@ public class TrajetController {
     }
 
     @PostMapping("/{id}/annuler")
-    public TrajetDTO annuler(@PathVariable Long id) {
-
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void annuler(@PathVariable Long id) {
         trajetService.annuler(id);
+    }
 
-        return trajetMapper.toDTO(
-                trajetService.chercherParId(id)
-        );
+    @PostMapping("/{id}/terminer")
+    public TrajetDTO terminer(@PathVariable Long id) {
+        return trajetMapper.toDTO(trajetService.terminer(id));
     }
 
     @DeleteMapping("/{id}")

@@ -7,6 +7,7 @@ import ma.youcode.covoiturage.dto.ReservationDTO;
 import ma.youcode.covoiturage.service.ReservationService;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class ReservationController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ReservationDTO creer(@Valid @RequestBody ReservationDTO dto) {
         return reservationService.creer(dto);
     }
@@ -44,12 +46,14 @@ public class ReservationController {
     }
 
     @PatchMapping("/{id}/annuler")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void annuler(@PathVariable Long id) {
         reservationService.annuler(id);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void supprimer(@PathVariable Long id) {
-        reservationService.supprimer(id);
+        reservationService.annuler(id);
     }
 }

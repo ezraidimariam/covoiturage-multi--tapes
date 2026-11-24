@@ -30,6 +30,7 @@ public class PointArret {
     private LocalDateTime heurePassage;
 
     // Prix calculé depuis le point de départ jusqu'à cet arrêt.
+    @Column(precision = 12, scale = 2, nullable = false)
     private BigDecimal prixDepuisDepart;
 
     // Évite la récursion infinie lors de la conversion en JSON.

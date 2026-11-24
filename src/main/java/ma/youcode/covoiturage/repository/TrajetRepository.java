@@ -9,6 +9,7 @@ import ma.youcode.covoiturage.entity.StatutReservation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,6 +18,9 @@ import java.time.LocalDateTime;
 
 // Repository pour gérer et rechercher les trajets.
 public interface TrajetRepository extends JpaRepository<Trajet, Long> {
+
+    @EntityGraph(attributePaths = {"pointsArret", "conducteur", "vehicule"})
+    java.util.Optional<Trajet> findById(Long id);
 
     // Vérifie si un véhicule est déjà utilisé dans un trajet.
     boolean existsByVehicule_Id(Long vehiculeId);

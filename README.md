@@ -99,7 +99,18 @@ Les contrôleurs sont préfixés par `/api`. Les ressources principales sont :
 | Points d'arrêt | `/api/points-arret` |
 | Réservations | `/api/reservations` |
 
-Les routes de collection prennent en charge la création et la liste; les routes `/{id}` fournissent les opérations par identifiant définies par chaque contrôleur. Actions spécifiques : `GET /api/trajets/rechercher`, `POST /api/trajets/{id}/publier`, `POST /api/trajets/{id}/annuler` et `PATCH /api/reservations/{id}/annuler`.
+Les routes de collection prennent en charge la création et la liste; les routes `/{id}` fournissent les opérations par identifiant définies par chaque contrôleur. Un trajet est créé en brouillon (statut `null`), ses points sont ajoutés, puis il est publié après validation de tout l'itinéraire. Les points et le trajet ne sont modifiables qu'avant publication.
+
+Routes complémentaires :
+
+- `GET /api/conducteurs/rechercher?nom=...` ou `?email=...` : recherche d'un conducteur.
+- `GET /api/conducteurs/{id}/reservations` : réservations des trajets du conducteur.
+- `GET /api/passagers/rechercher?email=...` : recherche d'un passager.
+- `GET /api/passagers/{id}/reservations` : historique des réservations du passager.
+- `GET /api/vehicules/conducteur/{id}` : véhicules d'un conducteur.
+- `POST /api/trajets/{id}/terminer` : termine un trajet après son départ.
+
+`GET /api/trajets/{id}` renvoie le parcours ordonné, les places restantes et le conducteur. Les erreurs de l'API utilisent le format `ProblemDetail` avec l'heure, le code, le type, le message et le chemin.
 
 ### Recherche de trajets
 
@@ -133,6 +144,12 @@ Linux ou macOS :
 ```bash
 ./mvnw test
 ```
+
+Une collection Postman pour le flux principal est disponible dans `postman/covoiturage.postman_collection.json`.
+
+## Limite d'accès
+
+L'application n'a pas de mécanisme de connexion ou d'identité authentifiée. Elle vérifie qu'un véhicule appartient au conducteur indiqué lors de la création d'un trajet, mais ne peut pas garantir qu'une requête de consultation, d'annulation ou de modification vient réellement du conducteur ou du passager concerné. Une authentification et une autorisation par rôle sont nécessaires avant une mise en production.
 
 ## Structure du code
 

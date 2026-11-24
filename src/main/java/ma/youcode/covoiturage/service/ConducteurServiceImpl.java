@@ -41,6 +41,14 @@ public class ConducteurServiceImpl implements ConducteurService {
         return conducteurRepository.findAll();
     }
 
+    @Override
+    public List<Conducteur> rechercher(String nom, String email) {
+        return conducteurRepository.findByNomContainingIgnoreCaseOrEmailIgnoreCase(
+                nom == null ? "" : nom,
+                email == null ? "" : email
+        );
+    }
+
     // Recherche un conducteur par son identifiant.
     // Retourne null si le conducteur n'existe pas.
     @Override

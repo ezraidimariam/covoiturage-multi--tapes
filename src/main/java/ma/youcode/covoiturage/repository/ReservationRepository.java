@@ -14,6 +14,10 @@ import java.util.Map;
 // Repository pour gérer les réservations dans la base de données.
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
+    java.util.List<Reservation> findByPassager_IdOrderByDateReservationDesc(Long passagerId);
+
+    java.util.List<Reservation> findByTrajet_Conducteur_IdOrderByDateReservationDesc(Long conducteurId);
+
     // Calcule le nombre total de places réservées pour un trajet et un statut donnés.
     @Query("""
         SELECT COALESCE(SUM(r.nombrePlaces), 0)

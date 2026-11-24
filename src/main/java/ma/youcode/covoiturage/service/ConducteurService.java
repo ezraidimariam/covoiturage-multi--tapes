@@ -11,6 +11,8 @@ public interface ConducteurService {
 
     List<Conducteur> lister();
 
+    List<Conducteur> rechercher(String nom, String email);
+
     Conducteur chercherParId(Long id);
 
     Conducteur modifier(Long id, Conducteur conducteur);

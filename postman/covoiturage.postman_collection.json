@@ -1,0 +1,65 @@
+{
+  "info": {
+    "name": "Covoiturage multi-étapes",
+    "description": "Parcours de démonstration de l'API. Lancez les requêtes dans l'ordre et remplacez les identifiants de collection selon les réponses obtenues.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8082" },
+    { "key": "conducteurId", "value": "1" },
+    { "key": "passagerId", "value": "1" },
+    { "key": "vehiculeId", "value": "1" },
+    { "key": "trajetId", "value": "1" },
+    { "key": "pointMonteeId", "value": "1" },
+    { "key": "pointDescenteId", "value": "2" },
+    { "key": "reservationId", "value": "1" },
+    { "key": "dateDepart", "value": "2027-01-15T17:00:00" }
+  ],
+  "item": [
+    {
+      "name": "Conducteurs",
+      "item": [
+        { "name": "Créer un conducteur", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Amrani\",\n  \"prenom\": \"Hamid\",\n  \"email\": \"hamid.amrani@example.com\",\n  \"telephone\": \"0600000001\",\n  \"numeroPermis\": \"PERMIS-0001\"\n}" }, "url": "{{baseUrl}}/api/conducteurs" } },
+        { "name": "Rechercher par nom ou email", "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/rechercher?nom=Amrani" } },
+        { "name": "Réservations des trajets du conducteur", "request": { "method": "GET", "url": "{{baseUrl}}/api/conducteurs/{{conducteurId}}/reservations" } }
+      ]
+    },
+    {
+      "name": "Passagers",
+      "item": [
+        { "name": "Créer un passager", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Bennani\",\n  \"prenom\": \"Salma\",\n  \"email\": \"salma.bennani@example.com\",\n  \"telephone\": \"0600000002\"\n}" }, "url": "{{baseUrl}}/api/passagers" } },
+        { "name": "Rechercher par email", "request": { "method": "GET", "url": "{{baseUrl}}/api/passagers/rechercher?email=salma.bennani%40example.com" } },
+        { "name": "Historique des réservations", "request": { "method": "GET", "url": "{{baseUrl}}/api/passagers/{{passagerId}}/reservations" } }
+      ]
+    },
+    {
+      "name": "Véhicules",
+      "item": [
+        { "name": "Créer un véhicule", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"marque\": \"Dacia\",\n  \"modele\": \"Logan\",\n  \"immatriculation\": \"12345-A-1\",\n  \"couleur\": \"Blanc\",\n  \"capacite\": 4,\n  \"conducteurId\": {{conducteurId}}\n}" }, "url": "{{baseUrl}}/api/vehicules" } },
+        { "name": "Lister les véhicules du conducteur", "request": { "method": "GET", "url": "{{baseUrl}}/api/vehicules/conducteur/{{conducteurId}}" } }
+      ]
+    },
+    {
+      "name": "Trajets",
+      "item": [
+        { "name": "Créer un trajet non publié", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"villeDepart\": \"Rabat\",\n  \"villeArrivee\": \"Marrakech\",\n  \"dateDepart\": \"{{dateDepart}}\",\n  \"placesProposees\": 3,\n  \"conducteurId\": {{conducteurId}},\n  \"vehiculeId\": {{vehiculeId}}\n}" }, "url": "{{baseUrl}}/api/trajets" } },
+        { "name": "Ajouter le point de départ (ordre 0)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"ville\": \"Rabat\",\n  \"ordre\": 0,\n  \"heurePassage\": \"{{dateDepart}}\",\n  \"prixDepuisDepart\": 0,\n  \"trajetId\": {{trajetId}}\n}" }, "url": "{{baseUrl}}/api/points-arret" } },
+        { "name": "Ajouter une étape", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"ville\": \"Settat\",\n  \"ordre\": 1,\n  \"heurePassage\": \"2027-01-15T19:15:00\",\n  \"prixDepuisDepart\": 70,\n  \"trajetId\": {{trajetId}}\n}" }, "url": "{{baseUrl}}/api/points-arret" } },
+        { "name": "Ajouter le point d'arrivée", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"ville\": \"Marrakech\",\n  \"ordre\": 2,\n  \"heurePassage\": \"2027-01-15T21:30:00\",\n  \"prixDepuisDepart\": 120,\n  \"trajetId\": {{trajetId}}\n}" }, "url": "{{baseUrl}}/api/points-arret" } },
+        { "name": "Publier le trajet", "request": { "method": "POST", "url": "{{baseUrl}}/api/trajets/{{trajetId}}/publier" } },
+        { "name": "Détail complet et places restantes", "request": { "method": "GET", "url": "{{baseUrl}}/api/trajets/{{trajetId}}" } },
+        { "name": "Rechercher un segment", "request": { "method": "GET", "url": "{{baseUrl}}/api/trajets/rechercher?villeDepart=Settat&villeArrivee=Marrakech&dateDepart=2027-01-15&nombrePlaces=1&page=0&size=10" } },
+        { "name": "Annuler le trajet", "request": { "method": "POST", "url": "{{baseUrl}}/api/trajets/{{trajetId}}/annuler" } },
+        { "name": "Terminer après le départ", "request": { "method": "POST", "url": "{{baseUrl}}/api/trajets/{{trajetId}}/terminer" } }
+      ]
+    },
+    {
+      "name": "Réservations",
+      "item": [
+        { "name": "Réserver un segment", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"nombrePlaces\": 1,\n  \"passagerId\": {{passagerId}},\n  \"trajetId\": {{trajetId}},\n  \"pointMonteeId\": {{pointMonteeId}},\n  \"pointDescenteId\": {{pointDescenteId}}\n}" }, "url": "{{baseUrl}}/api/reservations" } },
+        { "name": "Consulter la réservation", "request": { "method": "GET", "url": "{{baseUrl}}/api/reservations/{{reservationId}}" } },
+        { "name": "Annuler (minimum 24 h avant le départ)", "request": { "method": "PATCH", "url": "{{baseUrl}}/api/reservations/{{reservationId}}/annuler" } }
+      ]
+    }
+  ]
+}

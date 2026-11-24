@@ -88,12 +88,11 @@ public class PointArretServiceImpl implements PointArretService {
 
         StatutTrajet statut = point.getTrajet().getStatut();
 
-        if (statut == StatutTrajet.TERMINE
-                || statut == StatutTrajet.ANNULE) {
+        if (statut != null) {
 
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Impossible de modifier les points d'un trajet terminé ou annulé"
+                    "Les points d'arrêt ne peuvent être modifiés qu'avant publication"
             );
         }
     }

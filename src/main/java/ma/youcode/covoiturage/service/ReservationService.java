@@ -11,6 +11,10 @@ public interface ReservationService {
 
     List<ReservationDTO> trouverTous();
 
+    List<ReservationDTO> trouverParPassager(Long passagerId);
+
+    List<ReservationDTO> trouverParConducteur(Long conducteurId);
+
     ReservationDTO trouverParId(Long id);
 
     ReservationDTO modifier(Long id, ReservationDTO dto);

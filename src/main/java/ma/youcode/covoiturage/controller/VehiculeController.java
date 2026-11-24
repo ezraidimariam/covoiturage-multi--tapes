@@ -54,6 +54,16 @@ public class VehiculeController {
                 .toList();
     }
 
+    @GetMapping("/conducteur/{conducteurId}")
+    public List<VehiculeDTO> trouverParConducteur(@PathVariable Long conducteurId) {
+        if (conducteurService.chercherParId(conducteurId) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Conducteur introuvable");
+        }
+        return vehiculeService.trouverParConducteur(conducteurId).stream()
+                .map(vehiculeMapper::toDTO)
+                .toList();
+    }
+
     @GetMapping("/{id}")
     public VehiculeDTO chercherParId(@PathVariable Long id) {
 

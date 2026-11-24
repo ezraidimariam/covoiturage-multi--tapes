@@ -14,12 +14,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class TrajetServiceImpl implements TrajetService {
+
+    private static final Logger log = LoggerFactory.getLogger(TrajetServiceImpl.class);
 
     private final TrajetRepository trajetRepository;
     private final PointArretRepository pointArretRepository;
@@ -37,7 +41,8 @@ public class TrajetServiceImpl implements TrajetService {
     @Override
     public Trajet creer(Trajet trajet) {
         verifierDateDepart(trajet.getDateDepart());
-        trajet.setStatut(StatutTrajet.PUBLIE);
+        // A trip stays unpublished until its complete itinerary is validated.
+        trajet.setStatut(null);
         return trajetRepository.save(trajet);
     }
 
@@ -54,13 +59,20 @@ public class TrajetServiceImpl implements TrajetService {
     }
 
     @Override
+    public long placesRestantes(Long id) {
+        Trajet trajet = chercherParId(id);
+        return trajet.getPlacesProposees() - reservationRepository.compterPlacesReservees(
+                id, StatutReservation.CONFIRMEE);
+    }
+
+    @Override
     public Trajet modifier(Long id, Trajet trajet) {
         Trajet trajetExistant = chercherParId(id);
 
-        if (!trajetExistant.getStatut().equals(StatutTrajet.PUBLIE)) {
+        if (trajetExistant.getStatut() != null) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Impossible de modifier un trajet déjà "+trajetExistant.getStatut());
+                    "Un trajet ne peut être modifié qu'avant publication");
         }
 
         verifierDateDepart(trajet.getDateDepart());
@@ -89,7 +101,8 @@ public class TrajetServiceImpl implements TrajetService {
 
         List<PointArret> points = pointArretRepository.findAll()
                 .stream()
-                .filter(p -> p.getTrajet().getId().equals(id))
+                .filter(p -> p.getTrajet() == trajet
+                        || id.equals(p.getTrajet().getId()))
                 .sorted((p1, p2) -> Integer.compare(
                         p1.getOrdre(), p2.getOrdre()))
                 .toList();
@@ -113,6 +126,13 @@ public class TrajetServiceImpl implements TrajetService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "La première ville doit être la ville de départ");
+        }
+
+        if (!premier.getHeurePassage().equals(trajet.getDateDepart())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "L'heure du premier point doit correspondre à l'heure de départ du trajet"
+            );
         }
 
         if (!dernier.getVille().equalsIgnoreCase(trajet.getVilleArrivee())) {
@@ -164,7 +184,7 @@ public class TrajetServiceImpl implements TrajetService {
         }
 
         trajet.setStatut(StatutTrajet.PUBLIE);
-
+        log.info("Trajet {} publié", id);
         return trajetRepository.save(trajet);
     }
 
@@ -193,11 +213,40 @@ public class TrajetServiceImpl implements TrajetService {
 
         trajet.setStatut(StatutTrajet.ANNULE);
         trajetRepository.save(trajet);
+        log.info("Trajet {} annulé avec ses réservations confirmées", id);
+    }
+
+    @Override
+    @Transactional
+    public Trajet terminer(Long id) {
+        Trajet trajet = chercherParId(id);
+        if (trajet.getStatut() != StatutTrajet.PUBLIE
+                && trajet.getStatut() != StatutTrajet.COMPLET) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Seuls les trajets publiés ou complets peuvent être terminés"
+            );
+        }
+        if (!LocalDateTime.now().isAfter(trajet.getDateDepart())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Un trajet ne peut être terminé qu'après son départ"
+            );
+        }
+        trajet.setStatut(StatutTrajet.TERMINE);
+        log.info("Trajet {} terminé", id);
+        return trajetRepository.save(trajet);
     }
 
     @Override
     public void supprimer(Long id) {
         Trajet trajet = chercherParId(id);
+        if (trajet.getStatut() != null) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Seul un trajet non publié peut être supprimé"
+            );
+        }
         trajetRepository.delete(trajet);
     }
 
@@ -219,7 +268,7 @@ public class TrajetServiceImpl implements TrajetService {
                 lendemain,
                 criteres.nombrePlaces(),
                 criteres.prixMax(),
-                StatutTrajet.PUBLIE,
+                StatutTrajet.COMPLET,
                 StatutReservation.CONFIRMEE,
                 pageable
         );

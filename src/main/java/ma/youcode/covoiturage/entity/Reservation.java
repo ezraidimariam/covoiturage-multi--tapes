@@ -27,6 +27,7 @@ public class Reservation {
 
     // Montant total à payer pour la réservation.
     // BigDecimal permet de gérer les valeurs monétaires avec précision.
+    @Column(precision = 12, scale = 2, nullable = false)
     private BigDecimal montantTotal;
 
     // Date et heure auxquelles la réservation a été effectuée.

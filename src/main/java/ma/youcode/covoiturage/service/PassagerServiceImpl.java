@@ -37,6 +37,11 @@ public class PassagerServiceImpl implements PassagerService {
         return passagerRepository.findAll();
     }
 
+    @Override
+    public Passager chercherParEmail(String email) {
+        return passagerRepository.findByEmailIgnoreCase(email).orElse(null);
+    }
+
     // Recherche un passager par son identifiant.
     // Retourne null si le passager n'existe pas.
     @Override

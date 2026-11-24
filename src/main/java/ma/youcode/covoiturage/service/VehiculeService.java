@@ -13,6 +13,8 @@ public interface VehiculeService {
 
     List<Vehicule> lister();
 
+    List<Vehicule> trouverParConducteur(Long conducteurId);
+
     Vehicule chercherParId(Long id);
 
     Vehicule modifier(Long id, Vehicule vehicule);

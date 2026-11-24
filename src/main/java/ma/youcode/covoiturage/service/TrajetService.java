@@ -18,11 +18,15 @@ public interface TrajetService {
 
     Trajet chercherParId(Long id);
 
+    long placesRestantes(Long id);
+
     Trajet modifier(Long id, Trajet trajet);
 
     Trajet publier(Long id);
 
     void annuler(Long id);
+
+    Trajet terminer(Long id);
 
     void supprimer(Long id);
 

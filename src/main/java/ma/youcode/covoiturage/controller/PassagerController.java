@@ -6,6 +6,7 @@ import ma.youcode.covoiturage.dto.PassagerDTO;
 import ma.youcode.covoiturage.entity.Passager;
 import ma.youcode.covoiturage.mapper.PassagerMapper;
 import ma.youcode.covoiturage.service.PassagerService;
+import ma.youcode.covoiturage.service.ReservationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,11 +19,32 @@ public class PassagerController {
 
     private final PassagerService passagerService;
     private final PassagerMapper passagerMapper;
+    private final ReservationService reservationService;
 
     public PassagerController(PassagerService passagerService,
-                              PassagerMapper passagerMapper) {
+                              PassagerMapper passagerMapper,
+                              ReservationService reservationService) {
         this.passagerService = passagerService;
         this.passagerMapper = passagerMapper;
+        this.reservationService = reservationService;
+    }
+
+    @GetMapping("/rechercher")
+    public PassagerDTO rechercherParEmail(@RequestParam String email) {
+        Passager passager = passagerService.chercherParEmail(email);
+        if (passager == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passager introuvable");
+        }
+        return passagerMapper.toDTO(passager);
+    }
+
+    @GetMapping("/{id}/reservations")
+    public List<ma.youcode.covoiturage.dto.ReservationDTO> reservations(
+            @PathVariable Long id) {
+        if (passagerService.chercherParId(id) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passager introuvable");
+        }
+        return reservationService.trouverParPassager(id);
     }
 
     @PostMapping

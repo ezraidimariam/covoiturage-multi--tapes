@@ -2,13 +2,13 @@
 services:
   postgres:
     image: postgres:16
-    container_name: covoiturage-db
+    container_name: covoiturage-db-2
     environment:
       POSTGRES_DB: covoiturage
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "15433:5432"
+      - "15435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

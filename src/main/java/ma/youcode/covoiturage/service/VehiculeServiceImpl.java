@@ -45,6 +45,11 @@ public class VehiculeServiceImpl implements VehiculeService {
     }
 
     @Override
+    public List<Vehicule> trouverParConducteur(Long conducteurId) {
+        return vehiculeRepository.findByConducteur_Id(conducteurId);
+    }
+
+    @Override
     public Vehicule chercherParId(Long id) {
         return vehiculeRepository.findById(id).orElse(null);
     }
