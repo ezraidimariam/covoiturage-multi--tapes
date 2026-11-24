@@ -1,6 +1,7 @@
 
 package ma.youcode.covoiturage.service;
 
+import ma.youcode.covoiturage.entity.Conducteur;
 import ma.youcode.covoiturage.entity.Vehicule;
 import ma.youcode.covoiturage.repository.TrajetRepository;
 import ma.youcode.covoiturage.repository.VehiculeRepository;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class VehiculeServiceImpl implements VehiculeService {

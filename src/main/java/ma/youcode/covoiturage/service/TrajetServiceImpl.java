@@ -37,7 +37,7 @@ public class TrajetServiceImpl implements TrajetService {
     @Override
     public Trajet creer(Trajet trajet) {
         verifierDateDepart(trajet.getDateDepart());
-        trajet.setStatut(null);
+        trajet.setStatut(StatutTrajet.PUBLIE);
         return trajetRepository.save(trajet);
     }
 
@@ -57,10 +57,10 @@ public class TrajetServiceImpl implements TrajetService {
     public Trajet modifier(Long id, Trajet trajet) {
         Trajet trajetExistant = chercherParId(id);
 
-        if (trajetExistant.getStatut() != null) {
+        if (!trajetExistant.getStatut().equals(StatutTrajet.PUBLIE)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Impossible de modifier un trajet déjà publié");
+                    "Impossible de modifier un trajet déjà "+trajetExistant.getStatut());
         }
 
         verifierDateDepart(trajet.getDateDepart());

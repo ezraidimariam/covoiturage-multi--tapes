@@ -15,6 +15,7 @@ public interface ReservationService {
 
     ReservationDTO modifier(Long id, ReservationDTO dto);
 
+
     void annuler(Long id);
 
     void supprimer(Long id);

@@ -14,6 +14,7 @@ import ma.youcode.covoiturage.service.TrajetService;
 import ma.youcode.covoiturage.service.VehiculeService;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ public class TrajetController {
             ConducteurService conducteurService,
             VehiculeService vehiculeService,
             TrajetMapper trajetMapper) {
+
         this.trajetService = trajetService;
         this.conducteurService = conducteurService;
         this.vehiculeService = vehiculeService;
@@ -50,7 +52,9 @@ public class TrajetController {
 
         if (conducteur == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Conducteur introuvable");
+                    HttpStatus.NOT_FOUND,
+                    "Conducteur introuvable"
+            );
         }
 
         Vehicule vehicule =
@@ -58,28 +62,37 @@ public class TrajetController {
 
         if (vehicule == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Vehicule introuvable");
+                    HttpStatus.NOT_FOUND,
+                    "Vehicule introuvable"
+            );
         }
 
         if (!vehicule.getConducteur().getId().equals(conducteur.getId())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "Ce véhicule n'appartient pas à ce conducteur");
+                    "Ce véhicule n'appartient pas à ce conducteur"
+            );
         }
 
         if (trajetDTO.placesProposees() > vehicule.getCapacite()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Le nombre de places dépasse la capacité du véhicule");
+                    "Le nombre de places dépasse la capacité du véhicule"
+            );
         }
 
-        Trajet trajet = trajetMapper.toEntity(trajetDTO, conducteur, vehicule);
+        Trajet trajet = trajetMapper.toEntity(
+                trajetDTO,
+                conducteur,
+                vehicule
+        );
 
         return trajetMapper.toDTO(trajetService.creer(trajet));
     }
 
     @GetMapping
     public List<TrajetDTO> lister() {
+
         return trajetService.lister()
                 .stream()
                 .map(trajetMapper::toDTO)
@@ -90,14 +103,21 @@ public class TrajetController {
     @GetMapping("/rechercher")
     public Page<TrajetRechercheResultatDTO> rechercher(
             @Valid @ModelAttribute RechercheTrajetDTO criteres,
-            Pageable pageable) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
-        return trajetService.rechercher(criteres, pageable);
+        // Création de la pagination sans tri.
+        // Le tri est déjà défini dans la requête du Repository.
+        Pageable pagination = PageRequest.of(page, size);
+
+        return trajetService.rechercher(criteres, pagination);
     }
 
     @GetMapping("/{id}")
     public TrajetDTO chercherParId(@PathVariable Long id) {
+
         Trajet trajet = trajetService.chercherParId(id);
+
         return trajetMapper.toDTO(trajet);
     }
 
@@ -111,7 +131,9 @@ public class TrajetController {
 
         if (conducteur == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Conducteur introuvable");
+                    HttpStatus.NOT_FOUND,
+                    "Conducteur introuvable"
+            );
         }
 
         Vehicule vehicule =
@@ -119,27 +141,38 @@ public class TrajetController {
 
         if (vehicule == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Vehicule introuvable");
+                    HttpStatus.NOT_FOUND,
+                    "Vehicule introuvable"
+            );
         }
 
         if (!vehicule.getConducteur().getId().equals(conducteur.getId())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN,
-                    "Ce véhicule n'appartient pas à ce conducteur");
+                    "Ce véhicule n'appartient pas à ce conducteur"
+            );
         }
 
         if (trajetDTO.placesProposees() > vehicule.getCapacite()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Le nombre de places dépasse la capacité du véhicule");
+                    "Le nombre de places dépasse la capacité du véhicule"
+            );
         }
 
-        Trajet trajet = trajetMapper.toEntity(trajetDTO, conducteur, vehicule);
+        Trajet trajet = trajetMapper.toEntity(
+                trajetDTO,
+                conducteur,
+                vehicule
+        );
+
         Trajet modifie = trajetService.modifier(id, trajet);
 
         if (modifie == null) {
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Trajet introuvable");
+                    HttpStatus.NOT_FOUND,
+                    "Trajet introuvable"
+            );
         }
 
         return trajetMapper.toDTO(modifie);
@@ -147,18 +180,24 @@ public class TrajetController {
 
     @PostMapping("/{id}/publier")
     public TrajetDTO publier(@PathVariable Long id) {
+
         return trajetMapper.toDTO(trajetService.publier(id));
     }
 
     @PostMapping("/{id}/annuler")
     public TrajetDTO annuler(@PathVariable Long id) {
+
         trajetService.annuler(id);
-        return trajetMapper.toDTO(trajetService.chercherParId(id));
+
+        return trajetMapper.toDTO(
+                trajetService.chercherParId(id)
+        );
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void supprimer(@PathVariable Long id) {
+
         trajetService.supprimer(id);
     }
 }

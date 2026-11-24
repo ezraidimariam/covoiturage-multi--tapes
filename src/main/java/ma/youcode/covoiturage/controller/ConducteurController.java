@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+// on a cree ce .. pour handler les requetes dun conducteur
 
 @RestController
 @RequestMapping("/api/conducteurs")
@@ -17,7 +18,7 @@ public class ConducteurController {
 
     private final ConducteurService conducteurService;
     private final ConducteurMapper conducteurMapper;
-
+//CONSTRU OU ON AJOUTE ...
     public ConducteurController(
             ConducteurService conducteurService,
             ConducteurMapper conducteurMapper) {
@@ -25,20 +26,20 @@ public class ConducteurController {
         this.conducteurMapper = conducteurMapper;
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping//celui qui handle methode post
+    @ResponseStatus(HttpStatus.CREATED)//
     public ConducteurDTO creer(@RequestBody ConducteurDTO conducteurDTO) {
         Conducteur conducteur = conducteurMapper.toEntity(conducteurDTO);
         Conducteur nouveauConducteur = conducteurService.creer(conducteur);
         return conducteurMapper.toDTO(nouveauConducteur);
     }
 
-    @GetMapping
+    @GetMapping//
     public List<ConducteurDTO> lister() {
         return conducteurService.lister()
                 .stream()
                 .map(conducteurMapper::toDTO)
-                .toList();
+                .toList();//immutable
     }
 
     @GetMapping("/{id}")

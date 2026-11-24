@@ -2,7 +2,7 @@
 package ma.youcode.covoiturage.service;
 
 import ma.youcode.covoiturage.entity.PointArret;
-import ma.youcode.covoiturage.entity.PointArret;
+import ma.youcode.covoiturage.entity.StatutTrajet;
 import ma.youcode.covoiturage.repository.PointArretRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,8 +24,11 @@ public class PointArretServiceImpl implements PointArretService {
 
     @Override
     public PointArret creer(PointArret pointArret) {
-        verifierTrajetNonPublie(pointArret);
+
+        verifierTrajetModifiable(pointArret);
+
         verifierPoint(pointArret, null);
+
         return pointArretRepository.save(pointArret);
     }
 
@@ -48,14 +51,16 @@ public class PointArretServiceImpl implements PointArretService {
             return null;
         }
 
-        if (!existant.getTrajet().getId().equals(pointArret.getTrajet().getId())) {
+        if (!existant.getTrajet().getId()
+                .equals(pointArret.getTrajet().getId())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Un point d'arrêt ne peut pas changer de trajet"
             );
         }
 
-        verifierTrajetNonPublie(existant);
+        verifierTrajetModifiable(existant);
+
         verifierPoint(pointArret, id);
 
         existant.setVille(pointArret.getVille());
@@ -72,17 +77,23 @@ public class PointArretServiceImpl implements PointArretService {
         PointArret pointArret = chercherParId(id);
 
         if (pointArret != null) {
-            verifierTrajetNonPublie(pointArret);
+
+            verifierTrajetModifiable(pointArret);
+
             pointArretRepository.delete(pointArret);
         }
     }
 
-    private void verifierTrajetNonPublie(PointArret point) {
+    private void verifierTrajetModifiable(PointArret point) {
 
-        if (point.getTrajet().getStatut() != null) {
+        StatutTrajet statut = point.getTrajet().getStatut();
+
+        if (statut == StatutTrajet.TERMINE
+                || statut == StatutTrajet.ANNULE) {
+
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Impossible de modifier les points d'un trajet déjà publié"
+                    "Impossible de modifier les points d'un trajet terminé ou annulé"
             );
         }
     }
@@ -94,7 +105,8 @@ public class PointArretServiceImpl implements PointArretService {
                         .stream()
                         .filter(p -> p.getTrajet().getId()
                                 .equals(point.getTrajet().getId()))
-                        .filter(p -> idIgnore == null || !p.getId().equals(idIgnore))
+                        .filter(p -> idIgnore == null
+                                || !p.getId().equals(idIgnore))
                         .toList()
         );
 
@@ -116,7 +128,9 @@ public class PointArretServiceImpl implements PointArretService {
         }
 
         if (point.getOrdre() == 0
-                && point.getPrixDepuisDepart().compareTo(BigDecimal.ZERO) != 0) {
+                && point.getPrixDepuisDepart()
+                .compareTo(BigDecimal.ZERO) != 0) {
+
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Le prix du premier point doit être égal à 0"
@@ -124,6 +138,7 @@ public class PointArretServiceImpl implements PointArretService {
         }
 
         points.add(point);
+
         points.sort(Comparator.comparingInt(PointArret::getOrdre));
 
         for (int i = 1; i < points.size(); i++) {
@@ -131,7 +146,9 @@ public class PointArretServiceImpl implements PointArretService {
             PointArret precedent = points.get(i - 1);
             PointArret actuel = points.get(i);
 
-            if (!actuel.getHeurePassage().isAfter(precedent.getHeurePassage())) {
+            if (!actuel.getHeurePassage()
+                    .isAfter(precedent.getHeurePassage())) {
+
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Les heures de passage doivent être croissantes"
@@ -140,6 +157,7 @@ public class PointArretServiceImpl implements PointArretService {
 
             if (actuel.getPrixDepuisDepart()
                     .compareTo(precedent.getPrixDepuisDepart()) <= 0) {
+
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Les prix doivent être strictement croissants"

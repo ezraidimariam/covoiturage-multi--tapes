@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Map;
+
+
 // Repository pour gérer les réservations dans la base de données.
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -18,7 +21,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         WHERE r.trajet.id = :trajetId
         AND r.statut = :statut
     """)
-
     // Reçoit l'identifiant du trajet et le statut des réservations à prendre en compte.
     Long compterPlacesReservees(
             @Param("trajetId") Long trajetId,
@@ -41,4 +43,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             StatutReservation statut,
             Long id
     );
+
 }
